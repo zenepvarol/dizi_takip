@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Series Tracker</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f8f9fa; }
+        .cast-row { display: flex; gap: 5px; margin-bottom: 5px; }
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .card {
+            width: calc(20% - 10px); /* 5 kart sığacak */
+            height: 250px; /* sabit yükseklik */
+            overflow: hidden;
+        }
+        .card-img-top {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+        }
+        .card-body {
+            height: 110px; 
+            overflow: hidden;
+        }
+        .card-title, .card-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <h1 class="mb-4">Admin Panel</h1>
+
+    <form method="POST" action="/admin">
+        <div class="mb-2"><input type="text" name="ad" class="form-control" placeholder="Series Name" required></div>
+        <div class="mb-2"><input type="text" name="afis_url" class="form-control" placeholder="Poster URL"></div>
+        <div class="mb-2"><input type="number" name="yil" class="form-control" placeholder="Year"></div>
+        <div class="mb-2"><input type="text" name="tur" class="form-control" placeholder="Genre"></div>
+
+        <h5>Cast</h5>
+        <div id="castContainer">
+            <div class="cast-row">
+                <input type="text" name="oyuncu_ad[]" class="form-control" placeholder="Actor Name" required>
+                <input type="text" name="karakter_ad[]" class="form-control" placeholder="Character Name" required>
+                <input type="text" name="karakter_resim[]" class="form-control" placeholder="Character Image URL">
+            </div>
+        </div>
+        <button type="button" class="btn btn-secondary mb-2" id="addCastBtn">+ Add Actor</button>
+        <button type="submit" class="btn btn-primary w-100">Save Series</button>
+    </form>
+
+    <hr>
+
+    <h3>Existing Series</h3>
+    <div class="cards-container">
+        {% for d in diziler %}
+        <div class="card">
+            <img src="{{ d['afis_url'] if d['afis_url'] else 'https://via.placeholder.com/150' }}" class="card-img-top" alt="Poster">
+            <div class="card-body">
+                <h5 class="card-title">{{ d['dizi_ad'] }}</h5>
+                <p class="card-text">{{ d['yil'] }} | {{ d['tur'] }}</p>
+                <a href="/dizi_sil/{{ d['id'] }}" class="btn btn-sm btn-danger">Delete</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h3>Actors</h3>
+    <div class="cards-container">
+        {% for o in oyuncular %}
+        <div class="card">
+            <img src="{{ o['foto_url'] if o['foto_url'] else 'https://via.placeholder.com/150' }}" class="card-img-top" alt="Actor">
+            <div class="card-body">
+                <h5 class="card-title">{{ o['ad'] }}</h5>
+                <a href="/oyuncu_sil/{{ o['id'] }}" class="btn btn-sm btn-warning">Delete</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+const addBtn = document.getElementById("addCastBtn");
+const castContainer = document.getElementById("castContainer");
+
+addBtn.addEventListener("click", () => {
+    const row = document.createElement("div");
+    row.classList.add("cast-row");
+    row.innerHTML = `
+        <input type="text" name="oyuncu_ad[]" class="form-control" placeholder="Actor Name" required>
+        <input type="text" name="karakter_ad[]" class="form-control" placeholder="Character Name" required>
+        <input type="text" name="karakter_resim[]" class="form-control" placeholder="Character Image URL">
+    `;
+    castContainer.appendChild(row);
+});
+</script>
+</body>
+</html>
